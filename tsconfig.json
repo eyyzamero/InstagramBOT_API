@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"target": "ES6",
+		"moduleResolution": "Node",
+		"sourceMap": true,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"paths": {
+			"@environment": ["./src/environments/environment.ts"],
+			"*": [
+				"node_modules/*"
+			]
+		}
+	}
+}
