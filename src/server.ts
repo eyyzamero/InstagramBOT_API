@@ -2,6 +2,8 @@ import "reflect-metadata";
 import cors from "cors";
 import express from "express";
 import routes from "./core/routing/application.routing";
+import Container from "typedi";
+import { WebSocketService } from "./core/services/regular/web-socket.service";
 var bodyParser = require('body-parser')
 
 const APPLICATION = express();
@@ -14,6 +16,9 @@ APPLICATION.use(cors())
 
 APPLICATION.use("/", routes);
 
-APPLICATION.listen(PORT, () => {
+const server = APPLICATION.listen(PORT, () => {
 	console.log(`Instagram BOT API server started at http://localhost:${PORT}`);
 });
+
+const webSocketService = Container.get(WebSocketService);
+webSocketService.initWebSocketServer(server);
