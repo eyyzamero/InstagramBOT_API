@@ -26,6 +26,7 @@ export class WebSocketClientSenderService {
 			new UserAddedToFollowingBody(username)
 		);
 
+		this._consoleLogOperation(`User: ${username} added from following`);
 		this.webSocketClientInstance?.webSocket.send(data);
 	}
 
@@ -36,6 +37,12 @@ export class WebSocketClientSenderService {
 			new UserRemovedFromFollowingBody(username)
 		);
 
+		this._consoleLogOperation(`User: ${username} removed from following`);
 		this.webSocketClientInstance?.webSocket.send(data);
+	}
+
+	private _consoleLogOperation(text: string) {
+		if (global.environment === "development")
+			console.log(text);
 	}
 }

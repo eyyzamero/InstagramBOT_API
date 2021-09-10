@@ -2,7 +2,7 @@ import { Feed, IgApiClient } from "instagram-private-api";
 import { ILoginReq } from "../../../controllers/auth/contracts/requests";
 import { Service } from "typedi";
 import { IFollowFromHashtagReq, IFollowTopAccountsFromPolandReq } from "../../../controllers/tasks/contracts/requests";
-import { WebSocketService } from "./web-socket.service";
+import { WebSocketClientSenderService } from "./web-socket-client-sender.service";
 
 @Service()
 export class InstagramAPIService {
@@ -10,7 +10,7 @@ export class InstagramAPIService {
 	private readonly _instagramAPIClient: IgApiClient;
 
 	constructor(
-		private _webSocketService: WebSocketService
+		private _webSocketClientSenderService: WebSocketClientSenderService
 	) {
 		this._instagramAPIClient = new IgApiClient();
 	}
@@ -36,15 +36,9 @@ export class InstagramAPIService {
 		for(const user of usersFoundOnFeedNotFollowing) {
 			if (numberOfFollowedUsers >= req.numberOfUsersToFollow) break;
 			
-			await this._instagramAPIClient.friendship.create(user.pk);
+			await this._followUser(user.pk, user.username);
 
-			this._sendMessageToWebSocketClient(
-				"EVENT_ON_ACCOUNT",
-				"NEW_USER_ADDED_TO_FOLLOWING", 
-				{
-					username: user.username
-				}
-			);
+			this._webSocketClientSenderService.logUserAddedToFollowing(user.username);
 
 			const timeToWaitUntilNextOperation = Math.round(Math.random() * 6000) + 1000;
 			await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
@@ -79,6 +73,7 @@ export class InstagramAPIService {
 
 			numberOfInteractions++;
 		}
+		return;
 	}
 
 	private _getTopAccountsFromPolandArray(): Array<string> {
@@ -96,15 +91,9 @@ export class InstagramAPIService {
 		const friendshipDestroy = await this._instagramAPIClient.friendship.destroy(userID);
 
 		if (friendshipDestroy)
-			this._sendMessageToWebSocketClient(
-				"EVENT_ON_ACCOUNT",
-				"USER_REMOVED_FROM_FOLLOWING", 
-				{
-					username: username
-				}
-			);
+			this._webSocketClientSenderService.logUserRemovedFromFollowing(username);
 		
-		const timeToWaitUntilNextOperation = Math.round(Math.random() * 1000) + 1000;
+		const timeToWaitUntilNextOperation = Math.round(Math.random() * 2000) + 1000;
 		await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
 
 		await this._followUser(userID, username);
@@ -114,34 +103,16 @@ export class InstagramAPIService {
 		const friendshipCreate = await this._instagramAPIClient.friendship.create(userID);
 
 		if (friendshipCreate) 
-			this._sendMessageToWebSocketClient(
-				"EVENT_ON_ACCOUNT",
-				"NEW_USER_ADDED_TO_FOLLOWING", 
-				{
-					username: username
-				}
-			);
+			this._webSocketClientSenderService.logUserAddedToFollowing(username);
 	}
 
 	private async _getAllItemsFromFeed<T>(feed: Feed<any, T>): Promise<T[]> {
 		let items: Array<T> = new Array<T>();
+
 		do {
 			items = items.concat(await feed.items());
 		} while (feed.isMoreAvailable());
-		return items;
-	}
 
-	private _sendMessageToWebSocketClient(key: string, type: string, data: object | null) {
-		let username = global.sessionUsername;
-		if (username) {
-			
-			let client = this._webSocketService.getClientByUsername(username);
-			let res = {
-				key: key,
-				type: type,
-				data: data
-			};
-			client.webSocket.send(JSON.stringify(res));
-		}
+		return items;
 	}
 }

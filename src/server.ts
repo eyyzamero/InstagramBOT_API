@@ -20,5 +20,8 @@ const server = APPLICATION.listen(PORT, () => {
 	console.log(`Instagram BOT API server started at http://localhost:${PORT}`);
 });
 
+const environment = process.env.NODE_ENV || "development";
+global.environment = environment;
+
 const webSocketService = Container.get(WebSocketService);
 webSocketService.initWebSocketServer(server);
