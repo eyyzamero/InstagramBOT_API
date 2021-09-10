@@ -10,4 +10,9 @@ tasksRoutes.post("/followFromHashtag", async (req, res) => {
 	return res.json(controllerRes);
 });
 
+tasksRoutes.post("/followTopAccountsFromPoland", async (req, res) => {
+	let controllerRes = await tasksController.followTopAccountsFromPoland(req, res);
+	return res.json(controllerRes);
+});
+
 export default tasksRoutes;
