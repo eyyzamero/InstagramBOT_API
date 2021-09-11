@@ -27,7 +27,7 @@ export class WebSocketClientSenderService {
 		);
 
 		this._consoleLogOperation(`User: ${username} added from following`);
-		this.webSocketClientInstance?.webSocket.send(data);
+		this._sendMessageToClientWebSocket(data);
 	}
 
 	logUserRemovedFromFollowing(username: string) {
@@ -38,11 +38,16 @@ export class WebSocketClientSenderService {
 		);
 
 		this._consoleLogOperation(`User: ${username} removed from following`);
-		this.webSocketClientInstance?.webSocket.send(data);
+		this._sendMessageToClientWebSocket(data);
 	}
 
 	private _consoleLogOperation(text: string) {
 		if (global.environment === "development")
 			console.log(text);
+	}
+
+	private _sendMessageToClientWebSocket(data: object) {
+		const stringified = JSON.stringify(data);
+		this.webSocketClientInstance?.webSocket.send(stringified);
 	}
 }
