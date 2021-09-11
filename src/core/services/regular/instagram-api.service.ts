@@ -55,7 +55,7 @@ export class InstagramAPIService {
 		const following = await this._getAllItemsFromFeed(followingFeed);
 		const followingUsernames = following.map(x => x.username);
 
-		for(const account of this._getTopAccountsFromPolandArray(false)) {
+		for(const account of this._getTopAccountsFromPolandArray(true)) {
 			if (numberOfInteractions >= req.numberOfUsersToFollow) break;
 
 			const user = await this._instagramAPIClient.user.searchExact(account);
@@ -117,6 +117,10 @@ export class InstagramAPIService {
 			"kuba_wojewodzki_official", "reserved", "kwiatkowsky", "wujekluki", "linkimaster", "roxie_wegiel", "kruszwil", "dominikrupinski", "sylwialipka_music", "adam_zdrojkowski",
 			"malgorzatakozuchowska_", "pamelastefanowicz", "kingasawczuk", "magdagessler_official", "quebahombre", "netflixpl", "abstrachujetv", "jemerced", "queen_of_life_77", "dodaqueen",
 		);
+
+		if (shuffle) 
+			accounts.sort(() => Math.random() - 0.5);
+
 		return accounts;
 	}
 
