@@ -1,7 +1,7 @@
 import { Service } from "typedi";
 import { Request, Response } from "express";
 import { TasksCommunicationService } from "./services/communication/tasks-communication.service";
-import { FollowFromHashtagReq, FollowTopAccountsFromPoland } from "./contracts/requests";
+import { FollowFromHashtagReq, FollowNewIncomersThenFollowTopAccountsReq, FollowTopAccountsFromPolandReq } from "./contracts/requests";
 
 @Service()
 export class TasksController {
@@ -17,8 +17,14 @@ export class TasksController {
 	}
 
 	async followTopAccountsFromPoland(req: Request, res: Response) {
-		const serviceReq = new FollowTopAccountsFromPoland(req.body.numberOfUsersToFollow);
+		const serviceReq = new FollowTopAccountsFromPolandReq(req.body.numberOfUsersToFollow);
 		const serviceRes = await this._tasksCommunicationService.followTopAccountsFromPoland(serviceReq);
+		return serviceRes;
+	}
+
+	async followNewIncomersThenFollowTopAccountsFromPoland(req: Request, res: Response) {
+		const serviceReq = new FollowNewIncomersThenFollowTopAccountsReq(req.body.numberOfUsersToFollow);
+		const serviceRes = await this._tasksCommunicationService.followNewIncomersThenFollowTopAccountsFromPoland(serviceReq);
 		return serviceRes;
 	}
 }

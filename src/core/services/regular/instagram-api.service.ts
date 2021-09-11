@@ -1,7 +1,7 @@
 import { Feed, IgApiClient } from "instagram-private-api";
 import { ILoginReq } from "../../../controllers/auth/contracts/requests";
 import { Service } from "typedi";
-import { IFollowFromHashtagReq, IFollowTopAccountsFromPolandReq } from "../../../controllers/tasks/contracts/requests";
+import { FollowTopAccountsFromPolandReq, IFollowFromHashtagReq, IFollowNewIncomersThenFollowTopAccountsReq, IFollowTopAccountsFromPolandReq } from "../../../controllers/tasks/contracts/requests";
 import { WebSocketClientSenderService } from "./web-socket-client-sender.service";
 
 @Service()
@@ -55,7 +55,7 @@ export class InstagramAPIService {
 		const following = await this._getAllItemsFromFeed(followingFeed);
 		const followingUsernames = following.map(x => x.username);
 
-		for(const account of this._getTopAccountsFromPolandArray()) {
+		for(const account of this._getTopAccountsFromPolandArray(false)) {
 			if (numberOfInteractions >= req.numberOfUsersToFollow) break;
 
 			const user = await this._instagramAPIClient.user.searchExact(account);
@@ -63,6 +63,8 @@ export class InstagramAPIService {
 			if (!user) continue;
 
 			const followingThisAccount = followingUsernames.includes(user.username);
+
+			console.log(`Executing: ${followingThisAccount ? "UNFOLLOW_THEN_FOLLOW_BACK" : "FOLLOW_USER"} for username: ${user.username} [Iteration: ${numberOfInteractions}] `)
 
 			followingThisAccount
 				? await this._unfollowThenFollowBack(user.pk, user.username)
@@ -76,7 +78,38 @@ export class InstagramAPIService {
 		return;
 	}
 
-	private _getTopAccountsFromPolandArray(): Array<string> {
+	async followNewIncomersThenFollowTopAccountsFromPoland(req: IFollowNewIncomersThenFollowTopAccountsReq) {
+		let numberOfInteractions = 0;
+
+		const accountsWhitelist = this._getTopAccountsFromPolandArray(false);
+
+		const followersFeed = this._instagramAPIClient.feed.accountFollowers(this._instagramAPIClient.state.cookieUserId);
+		const followers = await this._getAllItemsFromFeed(followersFeed);
+		const followersExceptWhitelist = followers.filter(follower => !accountsWhitelist.includes(follower.username));
+
+		for(const follower of followersExceptWhitelist) {
+			if (numberOfInteractions >= req.numberOfUsersToFollow) break;
+			
+			await follower.checkFollow();
+
+			this._webSocketClientSenderService.logUserAddedToFollowing(follower.username);
+
+			const timeToWaitUntilNextOperation = Math.round(Math.random() * 6000) + 1000;
+			await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
+
+			numberOfInteractions++;
+		}
+
+		const interactionsLeft = req.numberOfUsersToFollow - numberOfInteractions;
+
+		if (interactionsLeft > 0) {
+			var req = new FollowTopAccountsFromPolandReq(interactionsLeft);
+
+			await this.followTopAccountsFromPoland(req);
+		}
+	}
+
+	private _getTopAccountsFromPolandArray(shuffle: boolean): Array<string> {
 		let accounts = new Array<string>(
 			"_rl9", "annalewandowskahpba", "wersow", "frizoluszek", "stuuburton", "lenkalul", "trombabomba", "chodakowskaewa", "martyna.world", "joannakrupa",
 			"fit.lovers", "juliawieniawa", "murcix", "sylwiaprzybysz", "blowek5", "marcindubiel", "juliakostera", "deynn", "ryskalamarcysia", "_minimajk",

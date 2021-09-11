@@ -1,6 +1,6 @@
 import { InstagramAPIService } from "../../../../core/services/regular/instagram-api.service";
 import { Service } from "typedi";
-import { IFollowFromHashtagReq, IFollowTopAccountsFromPolandReq } from "../../contracts/requests";
+import { IFollowFromHashtagReq, IFollowNewIncomersThenFollowTopAccountsReq, IFollowTopAccountsFromPolandReq } from "../../contracts/requests";
 
 @Service()
 export class TasksCommunicationService {
@@ -16,6 +16,11 @@ export class TasksCommunicationService {
 
 	async followTopAccountsFromPoland(req: IFollowTopAccountsFromPolandReq) {
 		let serviceRes = await this._instagramApiService.followTopAccountsFromPoland(req);
+		return serviceRes;
+	}
+
+	async followNewIncomersThenFollowTopAccountsFromPoland(req: IFollowNewIncomersThenFollowTopAccountsReq) {
+		let serviceRes = await this._instagramApiService.followNewIncomersThenFollowTopAccountsFromPoland(req);
 		return serviceRes;
 	}
 }

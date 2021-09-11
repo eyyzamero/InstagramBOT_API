@@ -15,4 +15,9 @@ tasksRoutes.post("/followTopAccountsFromPoland", async (req, res) => {
 	return res.json(controllerRes);
 });
 
+tasksRoutes.post("/followNewIncomersThenFollowTopAccountsFromPoland", async (req, res) => {
+	let controllerRes = await tasksController.followNewIncomersThenFollowTopAccountsFromPoland(req, res);
+	return res.json(controllerRes);
+});
+
 export default tasksRoutes;
