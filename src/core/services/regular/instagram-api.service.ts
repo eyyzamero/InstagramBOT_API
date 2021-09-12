@@ -40,7 +40,7 @@ export class InstagramAPIService {
 
 			this._webSocketClientSenderService.logUserAddedToFollowing(user.username);
 
-			const timeToWaitUntilNextOperation = Math.round(Math.random() * 6000) + 1000;
+			const timeToWaitUntilNextOperation = this._randomTime(8, 15);
 			await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
 			
 			numberOfFollowedUsers++;
@@ -70,7 +70,7 @@ export class InstagramAPIService {
 				? await this._unfollowThenFollowBack(user.pk, user.username)
 				: await this._followUser(user.pk, user.username)
 
-			const timeToWaitUntilNextOperation = Math.round(Math.random() * 6000) + 1000;
+			const timeToWaitUntilNextOperation = this._randomTime(8, 15);
 			await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
 
 			numberOfInteractions++;
@@ -94,7 +94,7 @@ export class InstagramAPIService {
 
 			this._webSocketClientSenderService.logUserAddedToFollowing(follower.username);
 
-			const timeToWaitUntilNextOperation = Math.round(Math.random() * 6000) + 1000;
+			const timeToWaitUntilNextOperation = this._randomTime(8, 15);
 			await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
 
 			numberOfInteractions++;
@@ -130,7 +130,7 @@ export class InstagramAPIService {
 		if (friendshipDestroy)
 			this._webSocketClientSenderService.logUserRemovedFromFollowing(username);
 		
-		const timeToWaitUntilNextOperation = Math.round(Math.random() * 2000) + 1000;
+		const timeToWaitUntilNextOperation = this._randomTime(5, 10);
 		await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
 
 		await this._followUser(userID, username);
@@ -151,5 +151,9 @@ export class InstagramAPIService {
 		} while (feed.isMoreAvailable());
 
 		return items;
+	}
+
+	private _randomTime(min: number, max: number) {
+		return (Math.floor(Math.random() * (max - min + 1)) + min) * 1000;
 	}
 }
