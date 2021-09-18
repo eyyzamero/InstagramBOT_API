@@ -1,7 +1,7 @@
 import { Feed, IgApiClient } from "instagram-private-api";
 import { ILoginReq } from "../../../controllers/auth/contracts/requests";
 import { Service } from "typedi";
-import { FollowTopAccountsFromPolandReq, IFollowFromHashtagReq, IFollowNewIncomersThenFollowTopAccountsReq, IFollowTopAccountsFromPolandReq } from "../../../controllers/tasks/contracts/requests";
+import { FollowTopAccountsFromPolandReq, IFollowFromHashtagReq, IFollowNewIncomersThenFollowTopAccountsReq, IFollowTopAccountsFromPolandReq, ILikePostsFromHashtagFeedReq } from "../../../controllers/tasks/contracts/requests";
 import { WebSocketClientSenderService } from "./web-socket-client-sender.service";
 
 @Service()
@@ -109,6 +109,24 @@ export class InstagramAPIService {
 		}
 	}
 
+	async likePostsFromHashtagFeed(req: ILikePostsFromHashtagFeedReq) {
+		let numberOfInteractions = 0;
+		let hashtagFeed = await this._instagramAPIClient.feed.tag(req.hashtag);
+		let hashtagFeedPosts = await hashtagFeed.items();
+
+		for(const post of hashtagFeedPosts) {
+			if (numberOfInteractions >= req.numberOfPostsToFollow) break;
+
+			await this._likeThePost(req.hashtag, post.id, post.user.username);
+
+			const timeToWaitUntilNextOperation = this._randomTime(8, 15);
+			await new Promise(resolve => setTimeout(resolve, timeToWaitUntilNextOperation));
+			
+			numberOfInteractions++;
+		}
+		return;
+	}
+
 	private _getTopAccountsFromPolandArray(shuffle: boolean): Array<string> {
 		let accounts = new Array<string>(
 			"_rl9", "annalewandowskahpba", "wersow", "frizoluszek", "stuuburton", "lenkalul", "trombabomba", "chodakowskaewa", "martyna.world", "joannakrupa",
@@ -122,6 +140,21 @@ export class InstagramAPIService {
 			accounts.sort(() => Math.random() - 0.5);
 
 		return accounts;
+	}
+
+	private async _likeThePost(hashtag: string, mediaID: string, username: string) {
+		const mediaLike = await this._instagramAPIClient.media.like({
+			d: 0,
+			mediaId: mediaID,
+			moduleInfo: {
+				module_name: "feed_contextual_hashtag",
+				hashtag: hashtag
+			}
+		});
+
+		if(mediaLike) {
+			this._webSocketClientSenderService.logPostFromHashtagFeedLiked(username, hashtag);
+		}
 	}
 
 	private async _unfollowThenFollowBack(userID: number, username: string) {

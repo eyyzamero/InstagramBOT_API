@@ -2,7 +2,7 @@ import { IWebSocketClientModel } from "../../../core/models";
 import { Service } from "typedi";
 import { WebSocketService } from "./web-socket.service";
 import { ClientWebSocketKey, ClientWebSocketType } from "../../enums";
-import { IUserAddedToFollowingRes, IUserRemovedFromFollowingRes, UserAddedToFollowingBody, UserAddedToFollowingRes, UserRemovedFromFollowingBody, UserRemovedFromFollowingRes } from "../../contracts/responses";
+import { IUserAddedToFollowingRes, IUserRemovedFromFollowingRes, UserAddedToFollowingBody, UserAddedToFollowingRes, UserRemovedFromFollowingBody, UserRemovedFromFollowingRes, IPostFromHashtagFeedLikedRes, PostFromHashtagFeedLikedRes } from "../../contracts/responses";
 
 @Service()
 export class WebSocketClientSenderService {
@@ -38,6 +38,17 @@ export class WebSocketClientSenderService {
 		);
 
 		this._consoleLogOperation(`User: ${username} removed from following`);
+		this._sendMessageToClientWebSocket(data);
+	}
+
+	logPostFromHashtagFeedLiked(username: string, hashtag: string) {
+		const data: IPostFromHashtagFeedLikedRes = new PostFromHashtagFeedLikedRes(
+			ClientWebSocketKey.LOG,
+			ClientWebSocketType.POST_FROM_HASHTAG_FEED_LIKED,
+			null
+		);
+
+		this._consoleLogOperation(`Liked post from hashtag: ${hashtag}`);
 		this._sendMessageToClientWebSocket(data);
 	}
 

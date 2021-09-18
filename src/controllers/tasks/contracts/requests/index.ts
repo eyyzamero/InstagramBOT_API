@@ -7,3 +7,4 @@ export * from "./implementations/follow-new-incomers-then-follow-top-accounts-re
 export * from "./interfaces/ifollow-from-hashtag-req";
 export * from "./interfaces/ifollow-top-accounts-from-poland-req";
 export * from "./interfaces/ifollow-new-incomers-then-follow-top-accounts-req";
+export * from "./interfaces/ilike-posts-from-hashtag-feed-req"

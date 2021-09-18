@@ -20,4 +20,9 @@ tasksRoutes.post("/followNewIncomersThenFollowTopAccountsFromPoland", async (req
 	return res.json(controllerRes);
 });
 
+tasksRoutes.post("/likePostsFromHashtagFeed", async (req, res) => {
+	let controllerRes = await tasksController.likePostsFromHashtagFeed(req, res);
+	return res.json(controllerRes);
+})
+
 export default tasksRoutes;
