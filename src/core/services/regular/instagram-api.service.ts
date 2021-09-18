@@ -31,7 +31,7 @@ export class InstagramAPIService {
 		let numberOfFollowedUsers: number = 0;
 		let tagFeed = await this._instagramAPIClient.feed.tag(req.hashtag);
 		let tagFeedItems = await tagFeed.items();
-		let usersFoundOnFeedNotFollowing = (await tagFeedItems).map(feedItem => feedItem.user).filter(x => !x.friendship_status.following);
+		let usersFoundOnFeedNotFollowing = (await tagFeedItems).map(feedItem => feedItem.user).filter((value, index, self) => !value.friendship_status.following && self.indexOf(value) === index);
 		
 		for(const user of usersFoundOnFeedNotFollowing) {
 			if (numberOfFollowedUsers >= req.numberOfUsersToFollow) break;
