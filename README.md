@@ -1,10 +1,8 @@
 # InstagramBOT_API
 
+InstagramBOT application API. API aims to automate various actions on an Instagram account to increase the number of followers. With this application, you can perform a number of actions such as automatic liking and commenting on posts, selectively following other users. All this was designed to greatly speed up the process of building a community on Instagram and help you succeed on this platform - there is only one small problem: the application is ineffective. After some time, the actions performed by the bot are caught by the algorithm on the Instagram platform as a result of which the project was abandoned.
+
 ## Stack technologiczny
 
 - Node.JS 16.13.1
 - TypeScript v4.4.2
-
-## Zamysł aplikacji
-
-API aplikacji InstagramBOT. API ma na celu zautomatyzowanie różnych działań na koncie Instagrama, aby zwiększyć liczbę obserujących. Dzięki tej aplikacji można wykonać szereg czynności takich jak automatyczne lajkowanie i komentowanie postów, selektywne śledzenie innych użytkowników. Wszystko to miało na celu znacznie przyśpieszyć proces budowania społeczności na Instagramie i pomóc w osiągnięciu sukcesu na tej platforie - jest tylko jeden mały problem: aplikacja jest nieskuteczna. Po pewnym czasie działania wykonywane przez bota są wyłapywane przez algorytm na platformie Instagram wskutek czego projekt został porzucony.
